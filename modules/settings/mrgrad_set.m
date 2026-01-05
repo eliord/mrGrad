@@ -78,8 +78,14 @@ end
 
 [~, AlternativeAxes, varargin] = argParse(varargin, 'apply_alternative_axes');
 
-[found_m, max_change, varargin] = argParse(varargin, 'max_change');
-if found_m
+% Take MAX_CHANGE from AlternativeAxes if provided, otherwise take from
+% function arguments
+if isfield(AlternativeAxes, 'max_change')
+    max_change = AlternativeAxes.max_change;
+else
+    [~, max_change, varargin] = argParse(varargin, 'max_change');
+end
+if ~isempty(max_change)
     if size(max_change,1)==1
         max_change = repmat(max_change,NROIs,1);
     end

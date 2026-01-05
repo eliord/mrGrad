@@ -1,4 +1,4 @@
-function tbls = mrGrad_for_lme_modeling(RG,Axes, Grouping)
+function tbls = mrGrad_for_lme_modeling(RG,Axes, Grouping, varargin)
 % A table for linear mixed-effects modelling (fitlme input)
 % -------------------------------------------------------------------------
 % INPUTS:
@@ -6,6 +6,13 @@ function tbls = mrGrad_for_lme_modeling(RG,Axes, Grouping)
 %   RG        mrGrad output with one or more groups and one or more ROIs
 %               either .mat or .csv mrgrad output
 %   Axes      one or more ROI's axes [1-3]
+%
+%
+% OPTIONAL: 
+% 
+%   Grouping  A categorical grouping variable in length of RG subjects
+%
+%             additional NAME, VALUE variables in length
 % -------------------------------------------------------------------------
 % OUTPUT:
 % 

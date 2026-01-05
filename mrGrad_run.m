@@ -45,7 +45,7 @@ parameter_units = {'1/s', 'fraction', 'p.u.'}; % units
 
 % output folder
 output_dir = fullfile(example_data_dir,'ExampleResults');
-output_mode = 'extended'; % extended mode for saving result segmentation niftis
+output_mode = 'extended'; % extended mode for saving NIfTIs of subjects' axis segmentations
 
 % run mrGrad
 RG = mrGrad(Data,'ROI',roi_labels,'n_segments',n_segments,'segmenting_method',segmenting_method,...
@@ -90,4 +90,13 @@ fig=mrgrad_axis_visualize(RG, axis_name, subIdx,...
 
 saveas(fig,fullfile(output_dir,'fig5_mrGrad_Axis1_segmentation.png'));
 
+%% Post hoc 'extended' output
+% If OUTPUT_MODE was 'default' and not 'extended', it is possible to
+% generate the extended output post hoc
+
+extended_not_exist = isempty(dir(fullfile(output_dir,"mrGradSeg/**/*.nii.gz")));
+if extended_not_exist
+    rg_mat = fullfile(output_dir, 'mrGrad_out.mat');
+    mrGrad_extend_output(rg_mat, 0);
+end
 %--------------------------------------------------------------------------
