@@ -150,7 +150,9 @@ for p = 1:nParam
                 y = YVals(groupMask,:);
                 mu = mean(y,1,"omitnan");
                 sigma = std(y,[],1,"omitnan");
-                sem = sigma / sqrt(size(y,1));
+
+                sz = sum(~isnan(y),1); % sample size may vary across segments (if subjects have NaN values);
+                sem = sigma ./ sqrt(sz);
 
                 switch error_name
                     case 'std'
@@ -169,7 +171,7 @@ for p = 1:nParam
                 end
 
                 % Actual group size for this parameter (omit nans)
-                groupSize_actual = nnz(~any(isnan(y),2));
+                groupSize_actual = nnz(~all(isnan(y),2)); % remove subjects if they don't have any data
 
                 if groupSize_actual==1 % only 1 subject in group
                     h = plot(xVals,y, markerShape, Color=cmap);
@@ -198,7 +200,7 @@ for p = 1:nParam
                              text(xVals(maxIdx(i)),y(i,maxIdx(i)), num2str(i),Color=cmap), ...
                              1:size(y,1));
                      end
-                individualPlotHandles{p,a} = [individualPlotHandles{p,a}, h2];
+                individualPlotHandles{p,a} = [individualPlotHandles{p,a}; h2];
                 end
             end
         end
@@ -225,35 +227,15 @@ for jj = 1:numel(Axes)
     ax = Axes(jj);
     y = gradientData(1).(ax.Tag).y{:,:};
     group_names = string(uniqueGroups(:));
-    groupSize_actual = arrayfun(@(g) nnz(~any(isnan(y(group_labels==g,:)),2)), group_names);
+    groupSize_actual = arrayfun(@(g) nnz(~all(isnan(y(group_labels==g,:)),2)), group_names);
 
     lgd_grps = compose("%s (n=%d)",group_names,groupSize_actual)';
     lgd_rois = strrep(string(rg_names(:)),'_',' ');
 
     lgd_entries = compose("%s: %s",lgd_rois, lgd_grps)';
-%     if length(lgd_rois) > 1
-%         lgd_entries = compose("%s: %s (n=%d)",lgd_rois',group_names,groupSize_actual')';
-%     else
-%         lgd_entries = compose("%s: %s (n=%d)",lgd_rois,group_names,groupSize_actual);
-%     end
     lgd_entries = lgd_entries(:);
     legend(ax, plotHandles{jj},lgd_entries);
 end
-
-
-
-% % Legend (first plot)
-% lgd_entries = strrep(string(rg_names),'_',' ');
-% if nGroups>1
-%     group_names = unique(group_labels)';
-%     if length(lgd_entries) > 1
-%         lgd_entries = compose("%s: %s (n=%d)",lgd_entries',string(group_names),groupSize')';
-%     else
-%         lgd_entries = compose("%s: %s (n=%d)",lgd_entries,string(group_names)',groupSize);
-%     end
-%     lgd_entries = lgd_entries(:);
-% end
-% legend(t.Children(end),plotHandles{1,1},lgd_entries);
 
 FigureHandles = struct;
 FigureHandles.figure = fig;

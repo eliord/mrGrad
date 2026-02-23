@@ -22,6 +22,13 @@ function singlsb_rgs = mrgrad_inner_loop(ii, rr, seg_list, map_list, mrgrad_defs
                 return
             end
 
+            if isfield(mrgrad_defs,'Alternative_seg_list')
+                if ~exist(mrgrad_defs.Alternative_seg_list{ii},'file')
+                    singlsb_rgs = [];
+                    return
+                end
+            end
+
             % load segmentation and keep nifti info
             mask = ROImask(seg_list{ii},roi,mrgrad_defs.erode_flag);
             image_info = niftiinfo(seg_list{ii});

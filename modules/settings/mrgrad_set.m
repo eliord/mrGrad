@@ -1,19 +1,22 @@
 function mrgrad_defs = mrgrad_set(varargin)
 mrgrad_defs = [];
-[found, ROI, varargin] = argParse(varargin, 'ROI');
-if ~found
+[~, ROI, varargin] = argParse(varargin, 'ROI');
+if isempty(ROI)
     error('please specify ROI label');
-end
-
-[found, roi_names, varargin] = argParse(varargin, 'roi_names');
-if ~found
-    fprintf(' roi_names not provided; mrGrad will use Freesurfer''s look-up table for roi_names.\n')
-    roi_names = ROI_name(ROI);
 end
 NROIs = numel(ROI);
 
-[found, segmentingMethod, varargin] = argParse(varargin, 'segmentingMethod');
-if ~found; segmentingMethod = 'equidistance'; end
+[~, roi_names, varargin] = argParse(varargin, 'roi_names');
+if isempty(roi_names)
+    fprintf(' roi_names not provided; mrGrad will use Freesurfer''s look-up table for roi_names.\n')
+    roi_names = ROI_name(ROI);
+end
+if numel(roi_names)~=NROIs
+    error('Length of ROI_NAMES should match the length of ROI (number of ROIs)');
+end
+
+[~, segmentingMethod, varargin] = argParse(varargin, 'segmentingMethod');
+if isempty(segmentingMethod); segmentingMethod = 'equidistance'; end
 segmentingMethod = lower(segmentingMethod);
 
 
@@ -34,8 +37,8 @@ elseif strcmpi(segmentingMethod,'VoxN')
     segmentingMethod = 'equivolume';
 end
 
-[found, Parallel, varargin] = argParse(varargin, 'Parallel');
-if ~found; Parallel = false; end
+[~, Parallel, varargin] = argParse(varargin, 'Parallel');
+if isempty(Parallel); Parallel = false; end
 
 [~, stat, varargin] = argParse(varargin, 'stat');
 if isempty(stat); stat = 'median'; end
@@ -49,8 +52,8 @@ if isempty(Axes)
     Axes = PC;
 end
 
-[found, n_segments, varargin] = argParse(varargin, 'n_segments');
-if ~found; n_segments = 7; end
+[~, n_segments, varargin] = argParse(varargin, 'n_segments');
+if isempty(n_segments); n_segments = 7; end
 if numel(n_segments)==1
     n_segments = repmat(n_segments,1,length(Axes));
 end
@@ -58,8 +61,8 @@ if numel(n_segments) ~= numel(Axes)
     error('mismatch between lengths of n_segments and PC');
 end
 
-[found, erode_flag, varargin] = argParse(varargin, 'erode');
-if ~found; erode_flag = 0; end
+[~, erode_flag, varargin] = argParse(varargin, 'erode');
+if isempty(erode_flag); erode_flag = 0; end
 
 [~, parameter_names, varargin] = argParse(varargin, 'parameter_names');
 if ~isempty(parameter_names)
@@ -160,9 +163,7 @@ mrgrad_defs.output_mode = output_mode;
 mrgrad_defs.parallel = Parallel;
 
 if ~isempty(AlternativeAxes)
-    if ~isa(AlternativeAxes.seg_list{1},'cell')
-        AlternativeAxes.seg_list = {AlternativeAxes.seg_list};
-    end
+    AlternativeAxes.seg_list = cellstr(AlternativeAxes.seg_list);
     if numel(AlternativeAxes.ROI)==1
         AlternativeAxes.ROI = repmat(AlternativeAxes.ROI,size(ROI));
     end
